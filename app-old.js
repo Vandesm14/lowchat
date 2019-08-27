@@ -27,54 +27,44 @@ app.get('/:room/:user', (req, res) => {
 	let room = req.params.room;
 	let user = req.params.user;
 
-	if (db[user] === undefined) { // User does not exist in entire DB
-		db[user] = {
-			room: room
-		};
+	if (db[room] === undefined) { // Create Room
+		db[room] = [{
+			user: user
+		}];
 		res.sendFile(__dirname + '/docs/pages/room.html');
-		console.log('New User');
-	} else if (Object.keys(db).find(obj => db[obj].room === room)) { // Duplicate User
+		console.log('Room Created');
+	} else if (db[room].find(obj => obj.user === user)) { // Duplicate User
 		res.send('[LowChat] Error: The user "' + user + '" already exists in the room. Please try a different username.');
 		console.log('Duplicate User');
+	} else { // Normal Entry
+		db[room].push({
+			user: user
+		});
+		res.sendFile(__dirname + '/docs/pages/room.html');
+		console.log('Normal Entry');
 	}
 	fs.writeFile('db.json', JSON.stringify(db), 'utf8', () => {
-		console.log('DB Updated');
+		console.log('DB Updated')
 	});
 });
 
 io.on('connection', function (socket) {
 	socket.on('init', function (data) {
 		let user = data.user;
-		let room = data.room;
-
-		if (db[user] === undefined) {
-			db[user] = {
-				room: room,
-				id: socket.id
-			};
-		} else {
-			// db.find((obj) => {
-			// 	if (obj.room === room) {
-			// 		obj.id = socket.id;
-			// 		return;
-			// 	}
-			// });
-			Object.keys(db).find((obj) => {
-				if (db[obj].room === room) {
-					db[obj].id = socket.id;
-					return;
-				}
-			});
-		}
 		console.log(`User ${socket.id} is now known as "${user}"`);
-
 		fs.writeFile('db.json', JSON.stringify(db), 'utf8', () => {
 			console.log('DB Updated')
+		});
+		db[room].find((obj) => {
+			if (obj.user === user) {
+				obj.id = socket.id;
+				return;
+			}
 		});
 	});
 
 	socket.on('disconnect', function () {
 		console.log('Client Disconnected');
-
+		
 	})
 });
