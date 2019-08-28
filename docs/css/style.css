@@ -10,12 +10,18 @@ body, div, p {
 	padding: 0;
 }
 
+a, a:visited {
+	text-decoration: underline;
+	color: lawngreen;
+	font-weight: 600;
+}
+
 .app {
 	display: flex;
 	flex-direction: column;
 }
 
-.history {
+.history, .list {
 	display: flex;
 	flex-direction: column;
 	height: 93vh;
@@ -44,6 +50,12 @@ body, div, p {
 .line-message.server {
 	color: lightgray;
 	margin: 8px;
+}
+
+.line-message .mention {
+	font-weight: 600;
+	text-decoration: underline;
+	color: yellow;
 }
 
 .interface {

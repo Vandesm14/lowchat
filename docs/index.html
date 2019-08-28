@@ -1,59 +1,31 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width">
-		<title>LowChat</title>
-		<link href="css/style.css" rel="stylesheet" type="text/css" />
-	</head>
-	<body>
-		<div class="app">
-			<div class="history">
-				<!-- <div class="line">
-					<p class="line-user">Vandesm14</p>
-					<p class="line-message">How is everything looking?</p>
-				</div>
-				<div class="line">
-					<p class="line-user">alex225</p>
-					<p class="line-message">Looking good!</p>
-				</div>
-				<div class="line">
-					<p class="line-user">ac50-bff3-3370</p>
-					<p class="line-message">Why is my name wierd letters</p>
-				</div>
-				<div class="line">
-					<p class="line-user">Vandesm14</p>
-					<p class="line-message">You did not choose a username, so the machine gave you a hex id instead</p>
-				</div>
-				<div class="line">
-					<p class="line-message server">linuxMan606 has connected</p>
-				</div>
-				<div class="line">
-					<p class="line-user">linuxMan606</p>
-					<p class="line-message">Is this running on Linux?</p>
-				</div>
-				<div class="line">
-					<p class="line-user">Vandesm14</p>
-					<p class="line-message">Yep. This entire site is hosted on https://repl.it</p>
-				</div> -->
-			</div>
-			<div class="interface">
-				<input type="text" id="message" placeholder="Send message to {{channel}} as {{user}}" autofocus>
-			</div>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>LowChat</title>
+	<link href="css/style.css" rel="stylesheet" type="text/css" />
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.9"></script>
+	<script src="js/room.js"></script>
+</head>
+
+<body>
+	<div class="app">
+		<div class="list">
+			<span id="typed"></span>
 		</div>
-		<script src="/socket.io/socket.io.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-		<script src="../js/script.js"></script>
-		<template id="lineTemplate">
-			<div class="line">
-				<p class="line-user">{{user}}</p>
-				<p class="line-message">{{message}}</p>
-			</div>
-		</template>
-		<template id="serverLineTemplate">
-			<div class="line">
-				<p class="line-message server">{{message}}</p>
-			</div>
-		</template>
-	</body>
+		<div class="interface">
+			<input type="text" id="message" autofocus>
+		</div>
+	</div>
+	<div id="typed-strings">
+		<p>Welcome to LowChat, the hyper-simple chatting platform. It's super easy to use this <b>logless</b> chatting
+			platform.<br> ^500 To join a room or create a new one, just add "/[room]/[username]" to the end of the current url!<br> ^500 You
+			can also share a room by copying the url while in a room (minus the "/[user]" part)<br><br> ^500 You can also just type in a room name and hit enter to create/join a room.</p>
+	</div>
+</body>
+
 </html>

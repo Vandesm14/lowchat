@@ -6,29 +6,24 @@
 	<meta name="viewport" content="width=device-width">
 	<title>LowChat</title>
 	<link href="../css/style.css" rel="stylesheet" type="text/css" />
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.9"></script>
+	<script src="../js/room.js"></script>
 </head>
 
 <body>
-	<div class="app">
-		<div class="history"></div>
+	<div class="app" data-page>
+		<div class="list">
+			<span id="typed"></span>
+		</div>
 		<div class="interface">
-			<input type="text" id="message" placeholder="Send message to {{channel}} as {{user}}" autofocus>
+			<input type="text" id="message" autofocus>
 		</div>
 	</div>
-	<script src="/socket.io/socket.io.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="../js/script.js"></script>
-	<template id="lineTemplate">
-		<div class="line">
-			<p class="line-user">{{user}}</p>
-			<p class="line-message">{{message}}</p>
-		</div>
-	</template>
-	<template id="serverLineTemplate">
-		<div class="line">
-			<p class="line-message server">{{message}}</p>
-		</div>
-	</template>
+	<div id="typed-strings">
+		<p>You're almost there! ^1000 Just type in a username and hit enter to join the room!</p>
+	</div>
 </body>
 
 </html>
