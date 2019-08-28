@@ -26,8 +26,13 @@ app.get('/', (req, res) => {
 app.get('/:room/:user', (req, res) => {
 	let room = req.params.room;
 	let user = req.params.user;
-
-	if (db[user] === undefined) { // User does not exist in entire DB
+	if (/\W/.test(user)) {
+		res.send('[LowChat] Error: Illegal characters present in username. The legal characters are "A-Z", "a-z", and "_".');
+		console.log('Illegal Username');
+	} else if (/\W/.test(room)) {
+		res.send('[LowChat] Error: Illegal characters present in room name. The legal characters are "A-Z", "a-z", and "_".');
+		console.log('Illegal Room Name');
+	} else if (db[user] === undefined) { // User does not exist in entire DB
 		db[user] = {
 			room: room
 		};
@@ -75,6 +80,16 @@ io.on('connection', function (socket) {
 
 	socket.on('disconnect', function () {
 		console.log('Client Disconnected');
-
+		Object.keys(db).find((obj) => {
+			if (db[obj].id === socket.id) { // Note SocketID is unique so checking for room isn't needed
+				delete db[obj];
+				console.log('Deleted "' + obj + '" from the DB');
+				return;
+			}
+		});
 	})
 });
+
+function sanitize(text) {
+	return text.replace(/<(?:.|\n)*>/gi, '[html]');
+}
