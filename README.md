@@ -1,5 +1,6 @@
 # lowchat
 This app looks simple, but it's actually packed with tons of client and server features.
+(Electron app will be a thing soon)
 
 ## Client Commands
 ### /users
