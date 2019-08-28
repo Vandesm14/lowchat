@@ -6,6 +6,7 @@
 	<meta name="viewport" content="width=device-width">
 	<title>LowChat</title>
 	<link href="../css/style.css" rel="stylesheet" type="text/css" />
+	<link rel="shortcut icon" type="image/x-icon" href="../images/fav.png">
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.9"></script>
@@ -13,6 +14,7 @@
 </head>
 
 <body>
+		<base target="_blank">
 	<div class="app" data-page>
 		<div class="list">
 			<span id="typed"></span>
@@ -24,6 +26,7 @@
 	<div id="typed-strings">
 		<p>You're almost there! ^1000 Just type in a username and hit enter to join the room!</p>
 	</div>
+	<input type="text" value="{{room}}" id="clipboard">
 </body>
 
 </html>

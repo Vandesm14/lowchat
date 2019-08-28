@@ -12,7 +12,7 @@ body, div, p {
 
 a, a:visited {
 	text-decoration: underline;
-	color: lawngreen;
+	color: red;
 	font-weight: 600;
 }
 
@@ -32,6 +32,7 @@ a, a:visited {
 .line {
 	display: flex;
 	flex-direction: row;
+	margin-bottom: 2px;
 }
 
 .line-user {
@@ -49,7 +50,7 @@ a, a:visited {
 
 .line-message.server {
 	color: lightgray;
-	margin: 8px;
+	margin: 4px;
 }
 
 .line-message .mention {
