@@ -44,10 +44,8 @@ app.get('/:room/:user', (req, res) => {
 	ip = ip.replace('::ffff:', '');
 	if (/\W/.test(user)) { // Illegal Username
 		res.send('[LowChat] Error: Illegal characters present in username. The legal characters are "A-Z", "a-z", and "_".');
-		// console.log('Illegal Username');
 	} else if (/\W/.test(room)) { // Illegal Username
 		res.send('[LowChat] Error: Illegal characters present in room name. The legal characters are "A-Z", "a-z", and "_".');
-		// console.log('Illegal Room Name');
 	} else if (db.users[user] === undefined) { // User does not exist in entire DB
 		db.users[user] = {
 			room: room,
@@ -56,7 +54,6 @@ app.get('/:room/:user', (req, res) => {
 		res.sendFile(__dirname + '/docs/pages/app.html');
 	} else if (Object.keys(db.users).find(obj => db.users[obj].room === room)) { // Duplicate User
 		res.send('[LowChat] Error: The user "' + user + '" already exists in the room. Please try a different username.<br>If you think this is a mistake, refresh the page again.');
-		// console.log('Duplicate User');
 	}
 	fs.writeFile('db.json', JSON.stringify(db.users), 'utf8', () => {});
 });
@@ -125,12 +122,10 @@ io.on('connection', function (socket) {
 
 	socket.on('disconnect', function () {
 		let ip = (socket.handshake.headers["x-real-ip"] || socket.conn.remoteAddress).replace('::ffff:', '');
-		// console.log('Client Disconnected');
 		Object.keys(db.users).find((obj) => {
 			if (db.users[obj].id === socket.id) { // Note SocketID is unique so checking for room isn't needed
 				socket.to(db.users[obj].room).emit('server', `User ${obj} has left the channel`);
 				delete db.users[obj];
-				// console.log('Deleted "' + obj + '" from the DB');
 				console.log(`User ${socket.id} (${obj}) has disconnected`);
 				return;
 			}
