@@ -8,13 +8,16 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
-fs.writeFile('function.txt', io.engine.generateId.toString(), 'utf8', () => {});
+fs.writeFile('db.json', '', 'utf8', () => {});
 
 io.engine.generateId = function (req) {
 	return randID();
 };
 
-var db = {};
+var db = {
+	users: {},
+	rooms: {}
+};
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -37,66 +40,70 @@ app.get('/:room/', (req, res) => {
 app.get('/:room/:user', (req, res) => {
 	let room = req.params.room;
 	let user = req.params.user;
+	let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+	ip = ip.replace('::ffff:', '');
 	if (/\W/.test(user)) { // Illegal Username
 		res.send('[LowChat] Error: Illegal characters present in username. The legal characters are "A-Z", "a-z", and "_".');
 		// console.log('Illegal Username');
 	} else if (/\W/.test(room)) { // Illegal Username
 		res.send('[LowChat] Error: Illegal characters present in room name. The legal characters are "A-Z", "a-z", and "_".');
 		// console.log('Illegal Room Name');
-	} else if (db[user] === undefined) { // User does not exist in entire DB
-		db[user] = {
-			room: room
+	} else if (db.users[user] === undefined) { // User does not exist in entire DB
+		db.users[user] = {
+			room: room,
+			ip: ip
 		};
 		res.sendFile(__dirname + '/docs/pages/app.html');
-		// console.log('New User');
-	} else if (Object.keys(db).find(obj => db[obj].room === room)) { // Duplicate User
+	} else if (Object.keys(db.users).find(obj => db.users[obj].room === room)) { // Duplicate User
 		res.send('[LowChat] Error: The user "' + user + '" already exists in the room. Please try a different username.<br>If you think this is a mistake, refresh the page again.');
 		// console.log('Duplicate User');
 	}
-	fs.writeFile('db.json', JSON.stringify(db), 'utf8', () => {});
+	fs.writeFile('db.json', JSON.stringify(db.users), 'utf8', () => {});
 });
 
 io.on('connection', function (socket) {
 	socket.on('init', function (data) {
 		let user = data.user;
 		let room = data.room;
-		let id = data.id;
+		let ip = (socket.handshake.headers["x-real-ip"] || socket.conn.remoteAddress).replace('::ffff:', '');
 
 		socket.join(room);
 		socket.emit('init-back', randID());
 		socket.to(room).emit('server', `User ${user} has joined the channel`);
 
-		if (db[user] === undefined) { // User doesn't already exist, add ID
-			db[user] = {
+		if (db.users[user] === undefined) { // User doesn't already exist, add ID
+			db.users[user] = {
 				room: room,
-				id: socket.id
+				id: socket.id,
+				ip: ip
 			};
 		} else {
-			Object.keys(db).find((obj) => { // User exists, add ID
-				if (db[obj].room === room && obj === user) {
-					db[obj].id = socket.id;
+			Object.keys(db.users).find((obj) => { // User exists, add ID
+				if (db.users[obj].room === room && obj === user) {
+					db.users[obj].id = socket.id;
+					db.users[obj].ip = ip;
 					return;
 				}
 			});
 		}
 		console.log(`User ${socket.id} is now known as "${user}"`);
-		fs.writeFile('db.json', JSON.stringify(db), 'utf8', () => {});
+		fs.writeFile('db.json', JSON.stringify(db.users), 'utf8', () => {});
 	});
 
 	socket.on('message', function (data) {
+		let ip = (socket.handshake.headers["x-real-ip"] || socket.conn.remoteAddress).replace('::ffff:', '');
 		let room;
-		Object.keys(db).find((obj) => {
-			if (db[obj].id === socket.id && db[obj] === data.user) { // Note SocketID is unique so checking for room isn't needed
-				room = db[obj].room;
+		Object.keys(db.users).find((obj) => {
+			if (db.users[obj].id === socket.id && db.users[obj] === data.user) { // Note SocketID is unique so checking for room isn't needed
+				room = db.users[obj].room;
 				return;
 			}
 		});
 		if (data.message[0] === '/') {
-			console.log('Command');
 			switch (data.message.split(' ')[0]) {
 				case '/users':
 					let message = [];
-					Object.keys(db).find((obj) => {
+					Object.keys(db.users).find((obj) => {
 						obj.room === room;
 						message.push(obj);
 					});
@@ -104,9 +111,9 @@ io.on('connection', function (socket) {
 					break;
 			}
 		} else {
-			Object.keys(db).find((obj) => {
-				if (db[obj].id === socket.id && obj === data.user) { // Note SocketID is unique so checking for room isn't needed
-					socket.to(db[obj].room).emit('message', {
+			Object.keys(db.users).find((obj) => {
+				if (db.users[obj].id === socket.id && obj === data.user) { // Note SocketID is unique so checking for room isn't needed
+					socket.to(db.users[obj].room).emit('message', {
 						user: data.user,
 						message: sanitize(data.message)
 					});
@@ -117,17 +124,18 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('disconnect', function () {
+		let ip = (socket.handshake.headers["x-real-ip"] || socket.conn.remoteAddress).replace('::ffff:', '');
 		// console.log('Client Disconnected');
-		Object.keys(db).find((obj) => {
-			if (db[obj].id === socket.id) { // Note SocketID is unique so checking for room isn't needed
-				socket.to(db[obj].room).emit('server', `User ${obj} has left the channel`);
-				delete db[obj];
+		Object.keys(db.users).find((obj) => {
+			if (db.users[obj].id === socket.id) { // Note SocketID is unique so checking for room isn't needed
+				socket.to(db.users[obj].room).emit('server', `User ${obj} has left the channel`);
+				delete db.users[obj];
 				// console.log('Deleted "' + obj + '" from the DB');
 				console.log(`User ${socket.id} (${obj}) has disconnected`);
 				return;
 			}
 		});
-		fs.writeFile('db.json', JSON.stringify(db), 'utf8', () => {});
+		fs.writeFile('db.json', JSON.stringify(db.users), 'utf8', () => {});
 	});
 });
 
