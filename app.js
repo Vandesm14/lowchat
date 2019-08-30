@@ -2,7 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const camelCase = require('camelcase');
+const camelCase = require('camelcase'); // NOTE: Unused
 
 const app = express();
 const http = require('http').Server(app);
@@ -42,15 +42,13 @@ app.get('/:room/:user', (req, res) => {
 	let user = req.params.user;
 	let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	ip = ip.replace('::ffff:', '');
+
 	if (/\W/.test(user)) { // Illegal Username
 		res.send('[LowChat] Error: Illegal characters present in username. The legal characters are "A-Z", "a-z", and "_".');
 	} else if (/\W/.test(room)) { // Illegal Username
 		res.send('[LowChat] Error: Illegal characters present in room name. The legal characters are "A-Z", "a-z", and "_".');
-	} else if (db.users[user] === undefined) { // User does not exist in entire DB
-		db.users[user] = {
-			room: room,
-			ip: ip
-		};
+	} else if (db.users[user] === undefined) { // New User
+		// CHANGE: Removed redundant DB update (same update is on socket connect/init)
 		res.sendFile(__dirname + '/docs/pages/app.html');
 	} else if (Object.keys(db.users).find(obj => db.users[obj].room === room)) { // Duplicate User
 		res.send('[LowChat] Error: The user "' + user + '" already exists in the room. Please try a different username.<br>If you think this is a mistake, refresh the page again.');
@@ -101,8 +99,9 @@ io.on('connection', function (socket) {
 				case '/users':
 					let message = [];
 					Object.keys(db.users).find((obj) => {
-						obj.room === room;
-						message.push(obj);
+						if (obj.room === room) {
+							message.push(obj);
+						}
 					});
 					socket.emit('server', message.join(', '));
 					break;
