@@ -45,15 +45,21 @@ app.get('/:room/:user', (req, res) => {
 
 	if (/\W/.test(user)) { // Illegal Username
 		res.send('[LowChat] Error: Illegal characters present in username. The legal characters are "A-Z", "a-z", and "_".');
-	} else if (/\W/.test(room)) { // Illegal Username
+	} else if (/\W/.test(room)) { // Illegal Room Name
 		res.send('[LowChat] Error: Illegal characters present in room name. The legal characters are "A-Z", "a-z", and "_".');
-	} else if (db.users[user] === undefined) { // New User
-		// CHANGE: Removed redundant DB update (same update is on socket connect/init)
+	} else if (!Object.keys(db.users).find(obj => db.users[obj].room === room && obj === user)) { // New User
 		res.sendFile(__dirname + '/docs/pages/app.html');
 	} else if (Object.keys(db.users).find(obj => db.users[obj].room === room)) { // Duplicate User
 		res.send('[LowChat] Error: The user "' + user + '" already exists in the room. Please try a different username.<br>If you think this is a mistake, refresh the page again.');
+	} else {
+		res.status(501).send('[LowChat] Error: The server has encountered an error upon joining the room. Please return to the <a href="/">homepage</a>.');
 	}
 	fs.writeFile('db.json', JSON.stringify(db.users), 'utf8', () => {});
+});
+
+app.get('*', (req, res) => {
+	// res.sendFile(__dirname + '/docs/pages/error.html');
+	res.status(404).send('Server Error: 404 Not Found');
 });
 
 io.on('connection', function (socket) {
