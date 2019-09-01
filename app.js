@@ -113,13 +113,14 @@ io.on('connection', function (socket) {
 				case '/users':
 					let message = [];
 					Object.keys(db.users).find((obj) => {
-						if (obj.room === room) {
+						if (db.users[obj].room === room) {
 							message.push(obj);
 						}
 					});
 					socket.emit('server', message.join(', '));
 					break;
 			}
+		} else {
 			socket.to(room).emit('message', {
 				user: data.user,
 				message: sanitize(data.message)

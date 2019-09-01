@@ -1,19 +1,19 @@
+/* jshint esversion: 6 */
 var client;
 var user = window.location.href.split('/');
 var room = window.location.href.split('/');
 var id = '';
 var cmd = ['/users', '/share'];
-var url = 'http://v14server.ml:5500';
+var url = window.location.host;
 
 user = user[user.length - 1];
 room = room[room.length - 2];
-
 
 $(document).ready(function () {
 	client = io.connect(url);
 
 	client.on('connect', function () {
-		let template = $('#message').attr('placeholder')
+		let template = $('#message').attr('placeholder');
 		template = template.replace('{{user}}', user);
 		template = template.replace('{{room}}', room);
 		$('#message').attr('placeholder', template);
@@ -26,6 +26,7 @@ $(document).ready(function () {
 
 	client.on('init-back', function (data) {
 		id = data;
+		console.log('Your id is: ' + id);
 	});
 
 	client.on('message', function (data) {
@@ -65,7 +66,7 @@ function sendMessage(elem) {
 				logMessageAsServer('Commands: ' + cmd.join(', '));
 				break;
 			default:
-				logMessageAsServer(`Command Error`);
+				logMessageAsServer('Client: Command Error');
 		}
 	} else {
 		logMessageAsCurrent(message);
