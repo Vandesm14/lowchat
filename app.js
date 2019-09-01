@@ -104,47 +104,35 @@ io.on('connection', function (socket) {
 		});
 
 		if (data.message[0] === '/') { // If message is a command
-			if (!db.rooms[room].ops.includes(ip)) { // If user is not an op
-				switch (data.message.split(' ')[0]) {
-					case '/users':
-						let message = [];
-						Object.keys(db.users).find((obj) => {
-							if (obj.room === room) {
-								message.push(obj);
-							}
-						});
-						socket.emit('server', message.join(', '));
-						break;
-				}
-			} else {
-				// Object.keys(db.users).find((obj) => {
-				// 	if (db.users[obj].id === socket.id && obj === data.user) { // Note SocketID is unique so checking for room isn't needed
-				// 		socket.to(db.users[obj].room).emit('message', {
-				// 			user: data.user,
-				// 			message: sanitize(data.message)
-				// 		});
-				// 		return;
-				// 	}
-				// });
-				socket.to(room).emit('message', {
-					user: data.user,
-					message: sanitize(data.message)
-				});
+			switch (data.message.split(' ')[0]) {
+				case '/users':
+					let message = [];
+					Object.keys(db.users).find((obj) => {
+						if (obj.room === room) {
+							message.push(obj);
+						}
+					});
+					socket.emit('server', message.join(', '));
+					break;
 			}
-
-			socket.on('disconnect', function () {
-				let ip = (socket.handshake.headers["x-real-ip"] || socket.conn.remoteAddress).replace('::ffff:', '');
-				Object.keys(db.users).find((obj) => {
-					if (db.users[obj].id === socket.id) { // Note SocketID is unique so checking for room isn't needed
-						socket.to(db.users[obj].room).emit('server', `User ${obj} has left the channel`);
-						delete db.users[obj];
-						console.log(`User ${socket.id} (${obj}) has disconnected`);
-						return;
-					}
-				});
-				fs.writeFile('db.json', JSON.stringify(db, null, "\t"), 'utf8', () => {});
+			socket.to(room).emit('message', {
+				user: data.user,
+				message: sanitize(data.message)
 			});
 		}
+	});
+
+	socket.on('disconnect', function () {
+		let ip = (socket.handshake.headers["x-real-ip"] || socket.conn.remoteAddress).replace('::ffff:', '');
+		Object.keys(db.users).find((obj) => {
+			if (db.users[obj].id === socket.id) { // Note SocketID is unique so checking for room isn't needed
+				socket.to(db.users[obj].room).emit('server', `User ${obj} has left the channel`);
+				delete db.users[obj];
+				console.log(`User ${socket.id} (${obj}) has disconnected`);
+				return;
+			}
+		});
+		fs.writeFile('db.json', JSON.stringify(db, null, "\t"), 'utf8', () => {});
 	});
 });
 
