@@ -63,6 +63,11 @@ app.get('*', (req, res) => {
 	res.status(404).send('Server Error: 404 Not Found');
 });
 
+app.get('*', (req, res) => {
+	// res.sendFile(__dirname + '/docs/pages/error.html');
+	res.status(404).send('Server Error: 404 Not Found');
+});
+
 io.on('connection', function (socket) {
 	socket.on('init', function (data) {
 		let user = data.user;
