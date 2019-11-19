@@ -19,8 +19,7 @@ div, h1, p {
 }
 
 a, a:visited {
-	color: #0000dd;
-	text-decoration: none;
+	color: #006eff;
 }
 
 .site, .app {
