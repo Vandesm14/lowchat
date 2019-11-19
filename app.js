@@ -150,7 +150,12 @@ io.on('connection', (socket) => {
 		}
 	});
 	socket.on('disconnect', (data) => {
-		// socket.to(socket.proto.room).emit('message', { name: 'server', message: `${socket.proto.name} has left` });
+		if (socket && socket.proto && socket.proto.room) {
+			socket.to(socket.proto.room).emit('message', {
+				name: 'server',
+				message: `${socket.proto.name} has left`
+			});
+		}
 	});
 });
 
