@@ -2,6 +2,9 @@ var client = io();
 var room = window.location.pathname;
 var key = false;
 
+var chathistory = [];
+var index = 0;
+
 $(document).ready(function () {
 	$('.message').focus();
 
@@ -36,8 +39,18 @@ $(document).ready(function () {
 			if (message.indexOf('/join') === 0) {
 				window.location.pathname = '/' + message.split(' ')[1];
 			} else {
-				client.emit('message', { message, key });
+				client.emit('message', { message });
+				chathistory.unshift(message);
+				index = 0;
 			}
+		} else if (e.keyCode === 38) {
+			e.preventDefault();
+			$(this).text(chathistory[index]);
+			index = (index + 1) % chathistory.length;
+		} else if (e.keyCode === 40) {
+			e.preventDefault();
+			$(this).text(chathistory[index]);
+			index = index - 1 < 0 ? 0 : index - 1;
 		}
 	});
 });
