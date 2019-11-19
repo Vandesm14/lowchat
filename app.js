@@ -5,6 +5,7 @@ const fs = require('fs');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io').listen(http);
+require('dotenv').config();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -128,10 +129,9 @@ io.on('connection', (socket) => {
 						let rooms = occurences(Object.keys(sockets).map(el => sockets[el].proto.room));
 						let users = rooms.b;
 						rooms = rooms.a;
-						// socket.emit('message', { name: 'server', message: Object.keys(sockets).map(el => sockets[el].proto.room).filter((el, i, self) => self.indexOf(el) == i).join(', ') });
 						socket.emit('message', {
 							name: 'server',
-							message: rooms.map((el, i) => `${el} (${users[i]})`).join(', ')
+							message: rooms.map((el, i) => `<a href="/${el}">${el}</a> (${users[i]})`).join(', ')
 						});
 						break;
 					default:
