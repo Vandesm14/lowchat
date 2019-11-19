@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
+
+html, body, .site, .app {
+	margin: 0;
+	padding: 0;
+	width: 100vw;
+	height: 100vh;
+}
+
+body {
+	background-color: black;
+	color: white;
+	font-family: 'Source Sans Pro', sans-serif;
+}
+
+div, h1, p {
+	margin: 0;
+	padding: 0;
+}
+
+a, a:visited {
+	color: #0000dd;
+	text-decoration: none;
+}
+
+.site, .app {
+	display: flex;
+	flex-direction: column;
+}
+
+/* ----------App---------- */
+.log, .message {
+	background-color: #ffffff11;
+	border: 3px solid white;
+	width: 80%;
+	margin: 10px auto;
+	padding: 10px;
+
+}
+
+.log {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	overflow-y: scroll;
+	overflow-wrap: break-word;
+}
+
+.item { 
+	/* display: flex;
+	flex-direction: row; */
+}
+
+.item-name, .item-message {
+	display: inline;
+}
+
+.item-name {
+	font-weight: 900;
+}
+
+.item-name::after {
+	content: ':';
+	/* margin-right: 10px; */
+}
+
+.item.server > .item-name::after {
+	content: '';
+}
+
+.item-message {
+	line-height: 1.2;
+}
+
+.item.server > .item-message {
+	font-style: italic;
+	color: lightgray;
+}
+
+.message {
+	display: block;
+	outline: none;
+	overflow-wrap: break-word;
+}
+
+.message:empty::before {
+	content: 'Send a message...';
+}

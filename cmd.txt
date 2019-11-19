@@ -1,0 +1,5 @@
+/join [room]
+/nick [newname]
+/help
+/users
+/rooms
