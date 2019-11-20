@@ -29,23 +29,23 @@ a, a:visited {
 
 /* ----------App---------- */
 .log, .message {
-	background-color: #ffffff11;
-	border: 3px solid white;
-	width: 80%;
 	margin: 10px auto;
 	padding: 10px;
-
+	width: 80%;
+	border: 3px solid white;
+	background-color: #ffffff11;
 }
 
 .log {
 	display: flex;
+	overflow-y: scroll;
 	flex-direction: column;
 	flex-grow: 1;
-	overflow-y: scroll;
+
 	overflow-wrap: break-word;
 }
 
-.item { 
+.item {
 	/* display: flex;
 	flex-direction: row; */
 }
@@ -75,12 +75,12 @@ a, a:visited {
 	content: ':';
 }
 
-.item.server > .item-name::after {
-	content: '';
-}
-
 .item.pm > .item-name::after {
 	content: ' >';
+}
+
+.item.server > .item-name::after {
+	content: '';
 }
 
 .item-message {
@@ -88,13 +88,14 @@ a, a:visited {
 }
 
 .item.server > .item-message {
-	font-style: italic;
 	color: lightgray;
+	font-style: italic;
 }
 
 .message {
 	display: block;
 	outline: none;
+
 	overflow-wrap: break-word;
 }
 
