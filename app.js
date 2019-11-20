@@ -68,6 +68,21 @@ io.on('connection', (socket) => {
 			if (message[0] === '/') {
 				let newname;
 				switch (message.split(' ')[0]) {
+					case '/msg':
+						let recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
+						if (recipient) {
+							socket.to(recipient).emit('message', {
+								name: '>' + socket.proto.name,
+								message: message.split(' ').slice(2).join(' '),
+								color: socket.id
+							});
+						} else {
+							socket.emit('message', {
+								name: 'server',
+								message: `Error: User ${message.split(' ')[1]} does not exist`
+							});
+						}
+						break;
 					case '/key':
 						if (message.split(' ')[1] === process.env.ADMIN) {
 							if (socket.proto.name[0] !== '@') {
