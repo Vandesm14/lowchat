@@ -52,7 +52,7 @@ io.on('connection', (socket) => {
 		});
 		socket.emit('message', {
 			name: 'server',
-			message: `Welcome to the Anonymous Chat! You are currently in room "${room}". To join a different room, type /join [room]`
+			message: `Welcome to LowChat v2! You are currently in room "${room}". To join a different room, type /join [room]. Type /help to see more commands`
 		});
 	});
 
@@ -106,7 +106,7 @@ io.on('connection', (socket) => {
 						break;
 					case '/nick':
 						if (message.split(' ')[1] && message.split(' ')[1].replace(/\W/g, '')) {
-							newname = message.split(' ')[1].replace(/\W/g, '');
+							newname = message.split(' ')[1].replace(/\W/g, '').substr(30);
 							if (!Object.keys(sockets).find(el => sockets[el].proto.name === newname) && newname !== 'server') {
 								socket.proto.name = message.split(' ')[1].replace(/\W/g, '');
 								io.to(socket.proto.room).emit('message', {
