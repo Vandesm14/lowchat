@@ -42,6 +42,7 @@ $(document).ready(function () {
 			} else if (message.indexOf('/clearlog') === 0) {
 				chatlog[room] = [];
 				localStorage.setItem('chatlog', JSON.stringify(chatlog));
+				location.reload();
 			} else {
 				client.emit('message', { message });
 				chathistory.unshift(message);
@@ -69,7 +70,7 @@ function parseChatLog() {
 }
 
 function appendLog(data, avoid) {
-	let log = document.getElementById('log');
+	let logdiv = document.getElementById('log');
 	let template = $('#itemTemplate').html();
 	let message = data.message.replace(/http(s)*:\/\/[^\s]*/g, '<a href="$&">$&</a>');
 	let color = data.color || data.name;
@@ -86,11 +87,10 @@ function appendLog(data, avoid) {
 	template = template.replace('{{message}}', message);
 	template = template.replace('{{color}}', color);
 	template = template.replace('{{time}}', time);
-	console.log(now-lasttime);
-	if (now - lasttime > 60*10) {
+	if (now - lasttime > 1000*60*60*24) {
+		lasttime = now;
 		appendLog({ name: '', message: '------ ' + now.toLocaleString() + ' ------', color: 'white', date: formatDate(now) }, true);
 	}
-	lasttime = now;
 	$('.log').append(template);
 	$('.log .item-name').each(function () {
 		$(this).css('color', '#' + $(this).data('color'));
@@ -98,7 +98,7 @@ function appendLog(data, avoid) {
 			$(this).css('color', 'red');
 		}
 	});
-	log.scrollTop = log.scrollHeight;
+	logdiv.scrollTop = logdiv.scrollHeight;
 	if (!avoid && data.name !== ' * ') {
 		if (!chatlog[room]) {
 			chatlog[room] = [];
