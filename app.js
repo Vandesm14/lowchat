@@ -74,7 +74,7 @@ io.on('connection', (socket) => {
 								socket.proto.name = '@' + socket.proto.name;
 								io.to(socket.proto.room).emit('message', {
 									name: 'server',
-									message: `${newname} is now an op`
+									message: `${socket.proto.name} is now an op`
 								});
 							} else {
 								socket.emit('message', {
