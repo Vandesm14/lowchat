@@ -1,5 +1,6 @@
 /join [room]
 /nick [newname]
+/clearlog
 /help
 /users
 /rooms

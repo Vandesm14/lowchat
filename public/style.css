@@ -50,8 +50,21 @@ a, a:visited {
 	flex-direction: row; */
 }
 
-.item-name, .item-message {
+.item > p {
 	display: inline;
+}
+
+.item-time::before {
+	content: '[';
+}
+
+.item-time {
+	/* display: none; */
+	color: grey;
+}
+
+.item-time::after {
+	content: ']';
 }
 
 .item-name {
@@ -60,11 +73,14 @@ a, a:visited {
 
 .item-name::after {
 	content: ':';
-	/* margin-right: 10px; */
 }
 
 .item.server > .item-name::after {
 	content: '';
+}
+
+.item.pm > .item-name::after {
+	content: ' >';
 }
 
 .item-message {
