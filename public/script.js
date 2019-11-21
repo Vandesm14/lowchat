@@ -15,15 +15,14 @@ var focus = true;
 $(document).ready(function () {
 	$('.message').focus();
 
+	client.emit('join', room);
+	room = room.substr(1);
 	if (localStorage.getItem('chatlog') && localStorage.getItem('version') === version) {
 		chatlog = JSON.parse(localStorage.getItem('chatlog'));
 		parseChatLog();
 	} else {
 		localStorage.setItem('version', version);
 	}
-
-	client.emit('join', room);
-	room = room.substr(1);
 	client.on('bounce', function (data) {
 		switch (data.type) {
 			case 'join':
