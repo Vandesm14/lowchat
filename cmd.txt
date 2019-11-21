@@ -1,6 +1,9 @@
-/join [room]
-/nick [newname]
 /clearlog
+/clearname
 /help
-/users
+/join [room]
+/msg [user] [message]
+/nick [name]
 /rooms
+/users
+/whois [user/room]

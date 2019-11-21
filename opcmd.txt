@@ -1,0 +1,5 @@
+/kick [user]
+/op [user]
+/deop [user]
+/mute [user]
+/unmute [user]

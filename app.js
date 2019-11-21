@@ -85,20 +85,152 @@ io.on('connection', (socket) => {
 		let sockets = io.of('/').in(socket.proto.room).sockets;
 		let room = socket.proto.room;
 		defaults(sockets, true);
-		if (message) {
 		message = message.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+		if (message && !socket.proto.muted) {
 			if (message[0] === '/') {
 				let newname;
 				let recipient;
 				let rooms;
 				switch (message.split(' ')[0]) {
+					case '/whois':
+						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
+						rooms = Object.keys(sockets).filter(el => sockets[el].proto.name === message.split(' ')[1]).map(el => sockets[el].proto.room);
+						if (recipient) {
+							socket.emit('message', {
+								name: 'server',
+								message: `<br>${message.split(' ')[1]} is ${recipient}<br>${message.split(' ')[1]} is in ${rooms.length} room${rooms.length > 1 ? 's' : ''}: ${rooms.join(', ')}<br>Online for: ${formatHMS(new Date() - sockets[recipient].proto.created)}<br>Admin: ${sockets[recipient].proto.admin}`
+							});
+						} else if (Object.keys(sockets).map(el => sockets[el].proto.room).includes(message.split(' ')[1])) {
+							rooms = Object.keys(sockets).filter(el => sockets[el].proto.room === room).map(el => sockets[el].proto.name);
+							socket.emit('message', {
+								name: 'server',
+								message: `${message.split(' ')[1]} has ${rooms.length} user${rooms.length > 1 ? 's' : ''}: ${rooms.join(', ')}`
+							});
+						} else {
+							socket.emit('message', {
+								name: 'server',
+								message: `Error: User/Room ${message.split(' ')[1]} does not exist`
+							});
+						}
+						break;
+					case '/kick':
+						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
+						if (socket.proto.admin) {
+							if (recipient) {
+								sockets[recipient].disconnect();
+							} else {
+								socket.emit('message', {
+									name: 'server',
+									message: `Error: User ${message.split(' ')[1]} does not exist`
+								});
+							}
+						} else {
+							socket.emit('message', {
+								name: 'server',
+								message: `Error: Invalid credentials`
+							});
+						}
+						break;
+					case '/deop':
+						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
+						if (socket.proto.admin) {
+							if (recipient) {
+								sockets[recipient].proto.admin = false;
+								io.to(socket.proto.room).emit('message', {
+									name: 'server',
+									message: `${sockets[recipient].proto.name} is no longer an op`
+								});
+							} else {
+								socket.emit('message', {
+									name: 'server',
+									message: `Error: User ${message.split(' ')[1]} does not exist`
+								});
+							}
+						} else {
+							socket.emit('message', {
+								name: 'server',
+								message: `Error: Invalid credentials`
+							});
+						}
+						break;
+					case '/op':
+						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
+						if (socket.proto.admin) {
+							if (recipient) {
+								sockets[recipient].proto.admin = true;
+								io.to(socket.proto.room).emit('message', {
+									name: 'server',
+									message: `${sockets[recipient].proto.name} is now an op`
+								});
+							} else {
+								socket.emit('message', {
+									name: 'server',
+									message: `Error: User ${message.split(' ')[1]} does not exist`
+								});
+							}
+						} else {
+							socket.emit('message', {
+								name: 'server',
+								message: `Error: Invalid credentials`
+							});
+						}
+						break;
+					case '/unmute':
+						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
+						if (socket.proto.admin) {
+							if (recipient) {
+								sockets[recipient].proto.muted = false;
+								io.to(socket.proto.room).emit('message', {
+									name: 'server',
+									message: `${sockets[recipient].proto.name} has been unmuted`
+								});
+							} else {
+								socket.emit('message', {
+									name: 'server',
+									message: `Error: User ${message.split(' ')[1]} does not exist`
+								});
+							}
+						} else {
+							socket.emit('message', {
+								name: 'server',
+								message: `Error: Invalid credentials`
+							});
+						}
+						break;
+					case '/mute':
+						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
+						if (socket.proto.admin) {
+							if (recipient) {
+								sockets[recipient].proto.muted = true;
+								io.to(socket.proto.room).emit('message', {
+									name: 'server',
+									message: `${sockets[recipient].proto.name} has been muted`
+								});
+							} else {
+								socket.emit('message', {
+									name: 'server',
+									message: `Error: User ${message.split(' ')[1]} does not exist`
+								});
+							}
+						} else {
+							socket.emit('message', {
+								name: 'server',
+								message: `Error: Invalid credentials`
+							});
+						}
+						break;
 					case '/msg':
-						let recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
+						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
 						if (recipient) {
 							socket.to(recipient).emit('message', {
-								name: '>' + socket.proto.name,
+								name: socket.proto.name,
 								message: message.split(' ').slice(2).join(' '),
-								color: socket.id
+								color: socket.proto.id,
+								type: 'direct'
+							});
+							socket.emit('message', {
+								name: 'server',
+								message: `Message sent to ${message.split(' ')[1]}`
 							});
 						} else {
 							socket.emit('message', {
@@ -109,7 +241,8 @@ io.on('connection', (socket) => {
 						break;
 					case '/key':
 						if (message.split(' ')[1] === process.env.ADMIN) {
-							if (socket.proto.name[0] !== '@') {
+							if (!socket.proto.admin) {
+								socket.proto.admin = true;
 								socket.proto.name = '@' + socket.proto.name;
 								io.to(socket.proto.room).emit('message', {
 									name: 'server',
@@ -256,4 +389,11 @@ function occurences(arr) {
 		a,
 		b
 	};
+}
+
+function formatHMS(time) {
+	let hours = Math.floor(time / 1000 / 60 / 60);
+	let minutes = Math.floor(time / 1000 / 60) % 60;
+	let seconds = Math.floor(time / 1000) % 60;
+	return `${hours}h:${minutes < 10 ? '0' + minutes : minutes}m:${seconds < 10 ? '0' + seconds : seconds}s`;
 }
