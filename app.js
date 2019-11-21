@@ -115,7 +115,7 @@ io.on('connection', (socket) => {
 						}
 						break;
 					case '/kick':
-						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
+						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1] && sockets[el].proto.room === room);
 						if (socket.proto.admin) {
 							if (recipient) {
 								sockets[recipient].disconnect();
@@ -133,7 +133,7 @@ io.on('connection', (socket) => {
 						}
 						break;
 					case '/deop':
-						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
+						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1] && sockets[el].proto.room === room);
 						if (socket.proto.admin) {
 							if (recipient) {
 								sockets[recipient].proto.admin = false;
@@ -155,7 +155,7 @@ io.on('connection', (socket) => {
 						}
 						break;
 					case '/op':
-						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
+						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1] && sockets[el].proto.room === room);
 						if (socket.proto.admin) {
 							if (recipient) {
 								sockets[recipient].proto.admin = true;
@@ -177,7 +177,7 @@ io.on('connection', (socket) => {
 						}
 						break;
 					case '/unmute':
-						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
+						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1] && sockets[el].proto.room === room);
 						if (socket.proto.admin) {
 							if (recipient) {
 								sockets[recipient].proto.muted = false;
@@ -199,7 +199,7 @@ io.on('connection', (socket) => {
 						}
 						break;
 					case '/mute':
-						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
+						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1] && sockets[el].proto.room === room);
 						if (socket.proto.admin) {
 							if (recipient) {
 								sockets[recipient].proto.muted = true;
@@ -221,7 +221,7 @@ io.on('connection', (socket) => {
 						}
 						break;
 					case '/msg':
-						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
+						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1] && sockets[el].proto.room === room);
 						if (recipient) {
 							socket.to(recipient).emit('message', {
 								name: socket.proto.name,
