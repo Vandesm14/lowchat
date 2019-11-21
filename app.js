@@ -38,14 +38,15 @@ io.on('connection', (socket) => {
 	socket.on('join', (data) => {
 		let room;
 		let rooms;
-		let sockets = io.sockets.clients().sockets;
 		defaults(socket);
 		if (data && data !== '/') {
 			room = data.substr(1).replace(/\W/g, '');
 		} else {
 			room = 'main';
 		}
+		let sockets = io.of('/').in(room).sockets;
 		if (!Object.keys(sockets).includes(room)) {
+			defaults(sockets, true);
 			socket.proto.room = room;
 			socket.proto.name = socket.id;
 			socket.proto.id = socket.id;

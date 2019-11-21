@@ -1,5 +1,5 @@
 var client = io();
-var room = window.location.pathname === '/' ? 'main' : window.location.pathname;
+var room = window.location.pathname === '/' ? '/main' : window.location.pathname;
 var key = false;
 
 var chathistory = [];
@@ -23,6 +23,7 @@ $(document).ready(function () {
 	}
 
 	client.emit('join', room);
+	room = room.substr(1);
 	client.on('bounce', function (data) {
 		switch (data.type) {
 			case 'join':
