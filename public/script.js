@@ -1,5 +1,5 @@
 var client = io();
-var room = window.location.pathname;
+var room = window.location.pathname === '/' ? 'main' : window.location.pathname;
 var key = false;
 
 var chathistory = [];
