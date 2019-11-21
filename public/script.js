@@ -23,6 +23,16 @@ $(document).ready(function () {
 	}
 
 	client.emit('join', room);
+	client.on('bounce', function (data) {
+		switch (data.type) {
+			case 'join':
+				if (localStorage.getItem('username')) {
+					client.emit('message', { message: `/nick ${localStorage.getItem('username')}` });
+				}
+				break;
+		}
+	});
+
 	client.on('message', function (data) {
 		data.time = formatDate(new Date());
 		appendLog(data);
@@ -43,7 +53,12 @@ $(document).ready(function () {
 				chatlog[room] = [];
 				localStorage.setItem('chatlog', JSON.stringify(chatlog));
 				location.reload();
+			} else if (message.indexOf('/clearname') === 0) {
+				localStorage.removeItem('username');
 			} else {
+				if (message.indexOf('/nick') === 0) {
+					localStorage.setItem('username', message.split(' ')[1]);
+				}
 				client.emit('message', { message });
 				chathistory.unshift(message);
 				index = 0;
@@ -75,22 +90,19 @@ function appendLog(data, avoid) {
 	let message = data.message.replace(/http(s)*:\/\/[^\s]*/g, '<a href="$&">$&</a>');
 	let color = data.color || data.name;
 	let time = data.time;
-	let now = new Date();
+	let type = 'n';
 	if (data.name === 'server') {
 		template = template.replace('{{type}}', 'server');
 		data.name = ' * ';
-	} else if (data.name.indexOf('>') === 0) {
+		avoid = true;
+	} else if (data.type && data.type === 'direct') {
 		template = template.replace('{{type}}', 'pm');
-		data.name = data.name.substr(1);
+		avoid = true;
 	}
 	template = template.replace('{{name}}', data.name);
 	template = template.replace('{{message}}', message);
 	template = template.replace('{{color}}', color);
 	template = template.replace('{{time}}', time);
-	if (now - lasttime > 1000*60*60*24) {
-		lasttime = now;
-		appendLog({ name: '', message: '------ ' + now.toLocaleString() + ' ------', color: 'white', date: formatDate(now) }, true);
-	}
 	$('.log').append(template);
 	$('.log .item-name').each(function () {
 		$(this).css('color', '#' + $(this).data('color'));
@@ -99,7 +111,7 @@ function appendLog(data, avoid) {
 		}
 	});
 	logdiv.scrollTop = logdiv.scrollHeight;
-	if (!avoid && data.name !== ' * ') {
+	if (!avoid) {
 		if (!chatlog[room]) {
 			chatlog[room] = [];
 		}
