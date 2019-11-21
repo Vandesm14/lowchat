@@ -29,6 +29,7 @@ $(document).ready(function () {
 				if (localStorage.getItem('username')) {
 					client.emit('message', { message: `/nick ${localStorage.getItem('username')}` });
 				}
+				document.title = `LowChat | ${room}`;
 				break;
 		}
 	});
