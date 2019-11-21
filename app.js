@@ -299,7 +299,7 @@ io.on('connection', (socket) => {
 					case '/users':
 						socket.emit('message', {
 							name: 'server',
-							message: Object.keys(sockets).filter(el => sockets[el].proto.room === room).map(el => sockets[el].proto.name).join(', ')
+							message: Object.keys(sockets).filter(el => sockets[el].proto.room === room).map(el => sockets[el].proto.name).join(', ').replace(socket.proto.name, '<b>$&</b>')
 						});
 						break;
 					case '/rooms':
