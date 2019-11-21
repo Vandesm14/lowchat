@@ -38,7 +38,7 @@ $(document).ready(function () {
 		appendLog(data);
 		if (!focus) {
 			unread++;
-			document.title = `LowChat v2 (${unread})`;
+			document.title = `LowChat | ${room} (${unread})`;
 		}
 	});
 
@@ -128,7 +128,7 @@ function formatDate(date) {
 $(window).focus(function () {
 	focus = true;
 	unread = 0;
-	document.title = 'LowChat v2';
+	document.title = 'LowChat | ' + room;
 }).blur(function () {
 	focus = false;
 });
