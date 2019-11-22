@@ -33,7 +33,6 @@ $(document).ready(function () {
 				break;
 		}
 	});
-
 	client.on('message', function (data) {
 		data.time = formatDate(new Date());
 		appendLog(data);
