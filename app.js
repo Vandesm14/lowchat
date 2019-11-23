@@ -34,6 +34,47 @@ io.engine.generateId = (req) => {
 	return randHex(6);
 };
 
+// io.of('/').sockets;
+function query(obj, and, db) {
+	let keys = Object.keys(obj);
+	let values = Object.values(obj);
+	let main = {};
+	let ret = {};
+	db = db || io.of('/').sockets;
+	for (let i in keys) {
+		if (i > 0 && and) {
+			Object.keys(main).filter(el => db[el].proto[keys[i]] === values[i]).map(el => ret[el] = db[el]);
+		} else {
+			Object.keys(db).filter(el => db[el].proto[keys[i]] === values[i]).map(el => main[el] = db[el]);
+		}
+	}
+	if (and) {
+		return ret;
+	} else {
+		return main;
+	}
+}
+
+function queryKeys(obj, and, db) {
+	let keys = Object.keys(obj);
+	let values = Object.values(obj);
+	let main = {};
+	let ret = {};
+	db = db || io.of('/').sockets;
+	for (let i in keys) {
+		if (i > 0 && and) {
+			Object.keys(main).filter(el => db[el].proto[keys[i]] === values[i]).map(el => ret[el] = db[el]);
+		} else {
+			Object.keys(db).filter(el => db[el].proto[keys[i]] === values[i]).map(el => main[el] = db[el]);
+		}
+	}
+	if (and) {
+		return Object.keys(ret);
+	} else {
+		return Object.keys(main);
+	}
+}
+
 io.on('connection', (socket) => {
 	socket.on('join', (data) => {
 		let room;
@@ -44,17 +85,25 @@ io.on('connection', (socket) => {
 		} else {
 			room = 'main';
 		}
-		let sockets = io.of('/').in(room).sockets;
-		if (!Object.keys(sockets).includes(room)) {
-			defaults(sockets, true);
+		// let sockets = io.of('/').in(room).sockets;
+		let allsockets = io.of('/').sockets;
+		defaults(allsockets, true);
+		let sockets = query({
+			room: room
+		});
+		if (!Object.keys(allsockets).includes(room)) {
 			socket.proto.room = room;
 			socket.proto.name = socket.id;
 			socket.proto.id = socket.id;
 			socket.proto.created = new Date();
 			socket.proto.admin = false;
-			rooms = Object.keys(sockets).map(el => sockets[el].proto.room);
+
+			rooms = Object.keys(allsockets).map(el => allsockets[el].proto.room);
 			socket.join(room);
-			socket.emit('bounce', { type: 'join', status: true });
+			socket.emit('bounce', {
+				type: 'join',
+				status: true
+			});
 			socket.to(room).emit('message', {
 				name: 'server',
 				message: `${socket.proto.id} has joined`
@@ -63,7 +112,10 @@ io.on('connection', (socket) => {
 				name: 'server',
 				message: `Welcome to LowChat v2! You are currently in room "${socket.proto.room}". To join a different room, type /join [room]. Type /help to see more commands`
 			});
-			if (rooms.filter(el => el === socket.proto.room).length === 1 && socket.proto.room !== 'main') {
+
+			if (query({
+					room: room
+				}).length === 1 && socket.proto.room !== 'main') {
 				socket.proto.admin = true;
 				io.to(socket.proto.room).emit('message', {
 					name: 'server',
@@ -83,26 +135,46 @@ io.on('connection', (socket) => {
 		defaults(socket);
 		let message = data.message.substr(0, 500);
 		let name = socket.proto.id;
-		let sockets = io.of('/').in(socket.proto.room).sockets;
+		// let sockets = io.of('/').in(socket.proto.room).sockets;
+		let sockets = query({
+			room: socket.proto.room
+		});
+		let allsockets = io.of('/').sockets;
 		let room = socket.proto.room;
 		defaults(sockets, true);
 		message = message.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 		if (message && !socket.proto.muted) {
 			if (message[0] === '/') {
 				let newname;
-				let recipient;
+				let selectedSocket;
 				let rooms;
 				switch (message.split(' ')[0]) {
 					case '/whois':
-						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1]);
-						rooms = Object.keys(sockets).filter(el => sockets[el].proto.name === message.split(' ')[1]).map(el => sockets[el].proto.room);
-						if (recipient) {
+						selectedSocket = query({
+							name: message.split(' ')[1],
+							id: message.split(' ')[1]
+						});
+						selectedSocket = query({
+							room: room
+						}, false, selectedSocket);
+						selectedSocket = selectedSocket[Object.keys(selectedSocket)[0]];
+						rooms = queryKeys({
+							name: message.split(' ')[1],
+							id: message.split(' ')[1]
+						}).map(el => allsockets[el].proto.room);
+						if (selectedSocket) {
 							socket.emit('message', {
 								name: 'server',
-								message: `<br>${message.split(' ')[1]} is ${recipient}<br>${message.split(' ')[1]} is in ${rooms.length} room${rooms.length > 1 ? 's' : ''}: ${rooms.join(', ')}<br>Online for: ${formatHMS(new Date() - sockets[recipient].proto.created)}<br>Admin: ${sockets[recipient].proto.admin}`
+								message: `<br>${selectedSocket.proto.id} is ${selectedSocket.proto.name}<br>
+								${selectedSocket.proto.name} is in ${rooms.length} room${rooms.length > 1 ? 's' : ''}: ${rooms.join(', ')}<br>
+								Online for: ${formatHMS(new Date() - selectedSocket.proto.created)}<br>
+								Admin: ${selectedSocket.proto.admin}`
 							});
-						} else if (Object.keys(sockets).map(el => sockets[el].proto.room).includes(message.split(' ')[1])) {
-							rooms = Object.keys(sockets).filter(el => sockets[el].proto.room === room).map(el => sockets[el].proto.name);
+						} else if (message.split(' ')[1].indexOf('#') === 0) {
+							selectedSocket = query({
+								room: message.split(' ')[1].substr(1)
+							});
+							rooms = Object.keys(selectedSocket).map(el => selectedSocket[el].proto.name);
 							socket.emit('message', {
 								name: 'server',
 								message: `${message.split(' ')[1]} has ${rooms.length} user${rooms.length > 1 ? 's' : ''}: ${rooms.join(', ')}`
@@ -115,10 +187,14 @@ io.on('connection', (socket) => {
 						}
 						break;
 					case '/kick':
-						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1] && sockets[el].proto.room === room);
+						selectedSocket = query({
+							name: message.split(' ')[1],
+							room: room
+						}, true);
+						selectedSocket = selectedSocket[Object.keys(selectedSocket)[0]];
 						if (socket.proto.admin) {
-							if (recipient) {
-								sockets[recipient].disconnect();
+							if (selectedSocket) {
+								selectedSocket.disconnect();
 							} else {
 								socket.emit('message', {
 									name: 'server',
@@ -133,13 +209,18 @@ io.on('connection', (socket) => {
 						}
 						break;
 					case '/deop':
-						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1] && sockets[el].proto.room === room);
+						selectedSocket = query({
+							name: message.split(' ')[1],
+							room: room
+						}, true);
+						selectedSocket = selectedSocket[Object.keys(selectedSocket)[0]];
 						if (socket.proto.admin) {
-							if (recipient) {
-								sockets[recipient].proto.admin = false;
+							if (selectedSocket && selectedSocket.proto.id !== socket.proto.id) {
+								selectedSocket.proto.admin = false;
+								selectedSocket.proto.name = selectedSocket.proto.name.replace('@', '');
 								io.to(socket.proto.room).emit('message', {
 									name: 'server',
-									message: `${sockets[recipient].proto.name} is no longer an op`
+									message: `${selectedSocket.proto.name} is no longer an op`
 								});
 							} else {
 								socket.emit('message', {
@@ -155,13 +236,18 @@ io.on('connection', (socket) => {
 						}
 						break;
 					case '/op':
-						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1] && sockets[el].proto.room === room);
+						selectedSocket = query({
+							name: message.split(' ')[1],
+							room: room
+						}, true);
+						selectedSocket = selectedSocket[Object.keys(selectedSocket)[0]];
 						if (socket.proto.admin) {
-							if (recipient) {
-								sockets[recipient].proto.admin = true;
+							if (selectedSocket) {
+								selectedSocket.proto.admin = true;
+								selectedSocket.proto.name = '@' + selectedSocket.proto.name;
 								io.to(socket.proto.room).emit('message', {
 									name: 'server',
-									message: `${sockets[recipient].proto.name} is now an op`
+									message: `${selectedSocket.proto.name} is now an op`
 								});
 							} else {
 								socket.emit('message', {
@@ -177,13 +263,17 @@ io.on('connection', (socket) => {
 						}
 						break;
 					case '/unmute':
-						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1] && sockets[el].proto.room === room);
+						selectedSocket = query({
+							name: message.split(' ')[1],
+							room: room
+						}, true);
+						selectedSocket = selectedSocket[Object.keys(selectedSocket)[0]];
 						if (socket.proto.admin) {
-							if (recipient) {
-								sockets[recipient].proto.muted = false;
+							if (selectedSocket) {
+								selectedSocket.proto.muted = false;
 								io.to(socket.proto.room).emit('message', {
 									name: 'server',
-									message: `${sockets[recipient].proto.name} has been unmuted`
+									message: `${selectedSocket.proto.name} has been unmuted`
 								});
 							} else {
 								socket.emit('message', {
@@ -199,13 +289,17 @@ io.on('connection', (socket) => {
 						}
 						break;
 					case '/mute':
-						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1] && sockets[el].proto.room === room);
+						selectedSocket = query({
+							name: message.split(' ')[1],
+							room: room
+						}, true);
+						selectedSocket = selectedSocket[Object.keys(selectedSocket)[0]];
 						if (socket.proto.admin) {
-							if (recipient) {
-								sockets[recipient].proto.muted = true;
+							if (selectedSocket && selectedSocket.proto.id !== socket.proto.id) {
+								selectedSocket.proto.muted = true;
 								io.to(socket.proto.room).emit('message', {
 									name: 'server',
-									message: `${sockets[recipient].proto.name} has been muted`
+									message: `${selectedSocket.proto.name} has been muted`
 								});
 							} else {
 								socket.emit('message', {
@@ -221,9 +315,13 @@ io.on('connection', (socket) => {
 						}
 						break;
 					case '/msg':
-						recipient = Object.keys(sockets).find(el => sockets[el].proto.name === message.split(' ')[1] && sockets[el].proto.room === room);
-						if (recipient) {
-							socket.to(recipient).emit('message', {
+						selectedSocket = query({
+							name: message.split(' ')[1],
+							room: room
+						}, true);
+						selectedSocket = selectedSocket[Object.keys(selectedSocket)[0]];
+						if (selectedSocket) {
+							socket.to(selectedSocket.proto.id).emit('message', {
 								name: socket.proto.name,
 								message: message.split(' ').slice(2).join(' '),
 								color: socket.proto.id,
@@ -265,7 +363,10 @@ io.on('connection', (socket) => {
 					case '/nick':
 						if (message.split(' ')[1] && message.split(' ')[1].replace(/\W/g, '')) {
 							newname = message.split(' ')[1].replace(/\W/g, '').substr(0, 30);
-							if (!Object.keys(sockets).find(el => sockets[el].proto.name === newname && sockets[el].proto.room === room) && newname !== 'server') {
+							if (queryKeys({
+									name: message.split(' ')[1],
+									room: room
+								}, true).length === 0 && newname !== 'server') {
 								if (socket.proto.admin) {
 									socket.proto.name = '@' + newname;
 								} else {
@@ -299,11 +400,13 @@ io.on('connection', (socket) => {
 					case '/users':
 						socket.emit('message', {
 							name: 'server',
-							message: Object.keys(sockets).filter(el => sockets[el].proto.room === room).map(el => sockets[el].proto.name).join(', ').replace(socket.proto.name, '<b>$&</b>')
+							message: queryKeys({
+								room: room
+							}).map(el => sockets[el].proto.name).join(', ').replace(socket.proto.name, '<b>$&</b>')
 						});
 						break;
 					case '/rooms':
-						rooms = occurences(Object.keys(sockets).map(el => sockets[el].proto.room));
+						rooms = occurences(Object.keys(allsockets).map(el => allsockets[el].proto.room));
 						let users = rooms.b;
 						rooms = rooms.a;
 						socket.emit('message', {
