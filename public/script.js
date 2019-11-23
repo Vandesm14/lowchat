@@ -6,9 +6,9 @@ var chathistory = [];
 var index = 0;
 
 var chatlog = {};
-var lasttime = new Date();
+var lasttime = false;
 
-var version = '1.0.1';
+var version = '2.0';
 var unread = 0;
 var focus = true;
 
@@ -27,7 +27,9 @@ $(document).ready(function () {
 		switch (data.type) {
 			case 'join':
 				if (localStorage.getItem('username')) {
-					client.emit('message', { message: `/nick ${localStorage.getItem('username')}` });
+					client.emit('message', {
+						message: `/nick ${localStorage.getItem('username')}`
+					});
 				}
 				document.title = `LowChat | ${room}`;
 				break;
@@ -35,6 +37,7 @@ $(document).ready(function () {
 	});
 	client.on('message', function (data) {
 		data.time = formatDate(new Date());
+		data.date = new Date();
 		appendLog(data);
 		if (!focus) {
 			unread++;
@@ -60,7 +63,9 @@ $(document).ready(function () {
 				if (message.indexOf('/nick') === 0) {
 					localStorage.setItem('username', message.split(' ')[1]);
 				}
-				client.emit('message', { message });
+				client.emit('message', {
+					message
+				});
 				chathistory.unshift(message);
 				index = 0;
 			}
@@ -81,7 +86,12 @@ function parseChatLog() {
 		for (let i in chatlog[room]) {
 			appendLog(chatlog[room][i], true);
 		}
-		appendLog({ name: '', message: '====== CACHE ======', color: 'white', time: formatDate(new Date()) }, true);
+		appendLog({
+			name: '',
+			message: '====== CACHE ======',
+			color: 'white',
+			time: formatDate(new Date())
+		}, true);
 	}
 }
 
@@ -100,6 +110,18 @@ function appendLog(data, avoid) {
 		template = template.replace('{{type}}', 'pm');
 		avoid = true;
 	}
+	data.date = new Date(data.date);
+	lasttime = new Date(lasttime);
+	if (data.date && lasttime && days(data.date) > days(lasttime)) {
+		appendLog({
+			name: '',
+			message: `------ ${data.date.toDateString()} ------`,
+			color: 'white',
+			time: formatDate(data.date),
+			date: false
+		}, true);
+	}
+	lasttime = data.date;
 	template = template.replace('{{name}}', data.name);
 	template = template.replace('{{message}}', message);
 	template = template.replace('{{color}}', color);
@@ -126,6 +148,11 @@ function formatDate(date) {
 	let hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours();
 	let minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
 	return `${hours}:${minutes} ${ampm}`;
+}
+
+function days(date) {
+	date = date - date.getTimezoneOffset()*60;
+	return Math.floor(date / 1000 / 60 / 60 / 24);
 }
 
 $(window).focus(function () {
