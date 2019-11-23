@@ -104,7 +104,7 @@ io.on('connection', (socket) => {
 				type: 'join',
 				status: true
 			});
-			socket.to(room).emit('message', {
+			toRoom(room).emit('message', {
 				name: 'server',
 				message: `${socket.proto.id} has joined`
 			});
