@@ -117,7 +117,7 @@ io.on('connection', (socket) => {
 					room: room
 				}).length === 1 && socket.proto.room !== 'main') {
 				socket.proto.admin = true;
-				io.to(socket.proto.room).emit('message', {
+				toRoom(socket.proto.room).emit('message', {
 					name: 'server',
 					message: `${socket.proto.name} is now an op`
 				});
@@ -218,7 +218,7 @@ io.on('connection', (socket) => {
 							if (selectedSocket && selectedSocket.proto.id !== socket.proto.id) {
 								selectedSocket.proto.admin = false;
 								selectedSocket.proto.name = selectedSocket.proto.name.replace('@', '');
-								io.to(socket.proto.room).emit('message', {
+								toRoom(socket.proto.room).emit('message', {
 									name: 'server',
 									message: `${selectedSocket.proto.name} is no longer an op`
 								});
@@ -245,7 +245,7 @@ io.on('connection', (socket) => {
 							if (selectedSocket) {
 								selectedSocket.proto.admin = true;
 								selectedSocket.proto.name = '@' + selectedSocket.proto.name;
-								io.to(socket.proto.room).emit('message', {
+								toRoom(socket.proto.room).emit('message', {
 									name: 'server',
 									message: `${selectedSocket.proto.name} is now an op`
 								});
@@ -271,7 +271,7 @@ io.on('connection', (socket) => {
 						if (socket.proto.admin) {
 							if (selectedSocket) {
 								selectedSocket.proto.muted = false;
-								io.to(socket.proto.room).emit('message', {
+								toRoom(socket.proto.room).emit('message', {
 									name: 'server',
 									message: `${selectedSocket.proto.name} has been unmuted`
 								});
@@ -297,7 +297,7 @@ io.on('connection', (socket) => {
 						if (socket.proto.admin) {
 							if (selectedSocket && selectedSocket.proto.id !== socket.proto.id) {
 								selectedSocket.proto.muted = true;
-								io.to(socket.proto.room).emit('message', {
+								toRoom(socket.proto.room).emit('message', {
 									name: 'server',
 									message: `${selectedSocket.proto.name} has been muted`
 								});
@@ -343,7 +343,7 @@ io.on('connection', (socket) => {
 							if (!socket.proto.admin) {
 								socket.proto.admin = true;
 								socket.proto.name = '@' + socket.proto.name;
-								io.to(socket.proto.room).emit('message', {
+								toRoom(socket.proto.room).emit('message', {
 									name: 'server',
 									message: `${socket.proto.name} is now an op`
 								});
@@ -372,7 +372,7 @@ io.on('connection', (socket) => {
 								} else {
 									socket.proto.name = newname;
 								}
-								io.to(socket.proto.room).emit('message', {
+								toRoom(socket.proto.room).emit('message', {
 									name: 'server',
 									message: `${name} is now known as ${socket.proto.name}`
 								});
@@ -421,7 +421,7 @@ io.on('connection', (socket) => {
 						});
 				}
 			} else {
-				io.to(socket.proto.room).emit('message', {
+				toRoom(socket.proto.room).emit('message', {
 					name: socket.proto.name,
 					message: message,
 					color: socket.proto.id
@@ -493,6 +493,17 @@ function occurences(arr) {
 		a,
 		b
 	};
+}
+
+function toRoom(room) {
+	return {
+		emit: (type, data) => {
+			let sockets = queryKeys({room: room});
+			for (let i in sockets) {
+				io.to(sockets[i]).emit(type, data);
+			}
+		}
+	}
 }
 
 function formatHMS(time) {
