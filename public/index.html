@@ -4,8 +4,9 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-	<title>LowChat</title>
+	<title>LowChat v2</title>
 	<link href="style.css" rel="stylesheet" type="text/css" />
+	<link rel="shortcut icon" href="images/fav.png" id="icon" />
 	<base target="_blank">
 </head>
 
@@ -16,17 +17,16 @@
 		<div class="box">
 			<p class="message" id="message" contenteditable="true"></p>
 		</div>
-	</div>
-	<template id="itemTemplate">
-		<div class="item {{type}}">
-			<p class="item-time">{{time}}</p>
-			<p class="item-name" data-color="{{color}}">{{name}}</p>
-			<p class="item-message">{{message}}</p>
-		</div>
-	</template>
-	<script src="/socket.io/socket.io.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="script.js"></script>
+		<template id="itemTemplate">
+			<div class="item {{type}}">
+				<p class="item-time">{{time}}</p>
+				<p class="item-name" data-color="{{color}}">{{name}}</p>
+				<p class="item-message">{{message}}</p>
+			</div>
+		</template>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="script.js"></script>
 </body>
 
 </html>

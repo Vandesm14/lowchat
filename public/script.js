@@ -39,6 +39,7 @@ $(document).ready(function () {
 		if (!focus) {
 			unread++;
 			document.title = `LowChat | ${room} (${unread})`;
+			$('#icon').prop('href', 'images/fav-unread.png');
 		}
 	});
 
@@ -131,6 +132,7 @@ $(window).focus(function () {
 	focus = true;
 	unread = 0;
 	document.title = 'LowChat | ' + room;
+	$('#icon').prop('href', 'images/fav.png');
 }).blur(function () {
 	focus = false;
 });
