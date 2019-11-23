@@ -10,6 +10,9 @@ user = user[user.length - 1];
 room = room[room.length - 2];
 
 $(document).ready(function () {
+	$(document).on("keypress",function (e){
+		$("#message").focus()
+	});
 	client = io.connect(url);
 
 	client.on('connect', function () {
