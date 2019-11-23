@@ -112,6 +112,7 @@ function appendLog(data, avoid) {
 	}
 	data.date = new Date(data.date);
 	lasttime = new Date(lasttime);
+	console.log(data.message, days(data.date), days(new Date()));
 	if (data.date && lasttime && days(data.date) > days(lasttime)) {
 		appendLog({
 			name: '',
@@ -152,7 +153,7 @@ function formatDate(date) {
 
 function days(date) {
 	date = date - date.getTimezoneOffset()*60;
-	return Math.floor(date / 1000 / 60 / 60 / 24);
+	return Math.round(date / 1000 / 60 / 60 / 24);
 }
 
 $(window).focus(function () {
