@@ -121,8 +121,10 @@ function appendLog(data, avoid) {
 }
 
 function formatDate(date) {
-	date = date.toLocaleTimeString();
-	return `${date.split(':')[0]}:${date.split(':')[1]} ${date.split(':')[2].split(' ')[1]}`;
+	let ampm = date.getHours() > 12 ? 'PM' : 'AM';
+	let hours = date.getHours() > 12 ? date.getHours() - 12 : date.getHours();
+	let minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+	return `${hours}:${minutes} ${ampm}`;
 }
 
 $(window).focus(function () {
