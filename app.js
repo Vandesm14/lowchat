@@ -170,7 +170,7 @@ io.on('connection', (socket) => {
 								Online for: ${formatHMS(new Date() - selectedSocket.proto.created)}<br>
 								Admin: ${selectedSocket.proto.admin}`
 							});
-						} else if (message.split(' ')[1].indexOf('#') === 0) {
+						} else if (message.split(' ')[1] && message.split(' ')[1].indexOf('#') === 0) {
 							selectedSocket = query({
 								room: message.split(' ')[1].substr(1)
 							});
