@@ -9,8 +9,8 @@ $(document).ready(function () {
 			}
 		}
 	});
-	${document}.on("keypress",function (e){
-		${"#message"}.focus()
+	$(document).on("keypress",function (e){
+		$("#message").focus()
 	})
 	var typed = new Typed('#typed', {
 		stringsElement: '#typed-strings',
