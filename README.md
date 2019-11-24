@@ -1,15 +1,48 @@
 # LowChat
 
-This app looks simple, but it's actually packed with tons of client and server features.
+A powerful chatting application which supports commands, nicknames, rooms, and is simplistic in design.
 
-## Client Commands
+# Commands
+## Client:
+**/clearlog**
+Clears the chatlog cache for the current room
 
-### General
+**/clearname**
+Clears the username cache
+
+**/help**
+Shows the available commands
+
+**/join `room`**
+Joins the specified room
+
+**/msg `user` `message`**
+Sends a direct/private message to the specified `user`
+
+**/nick `name`**
+Changes and saves your nickname
+
+**/rooms**
+Lists the active rooms on the server
 
 **/users**
+Lists the users in current room
 
-Prints the user list
+**/whois user/#room**
+Shows stats of the specified `user` or `#room`
 
-**/share**
+## Operator:
+**/kick `user`**
+Kicks the specified `user`
 
-Prints a shareable URL for the current room
+**/op `user`**
+Enables admin privilages for the speficied `user`
+
+**/deop `user`**
+Disables admin privilages for the specified `user`
+
+**/mute `user`**
+Mutes the specified `user`
+
+**/unmute `user`**
+Unmutes the specified `user`

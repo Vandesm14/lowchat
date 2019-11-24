@@ -6,7 +6,7 @@
 /nick [name]
 /rooms
 /users
-/whois [user/room]<br>OP: /kick [user]
+/whois [user/#room]<br>OP: /kick [user]
 /op [user]
 /deop [user]
 /mute [user]
