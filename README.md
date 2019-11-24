@@ -1,7 +1,8 @@
 # LowChat
 
 A powerful chatting application which supports commands, nicknames, rooms, and is simplistic in design.
-Hosted site can be found [here](https://chat.hyperjs.ml/)
+
+The hosted server can be found [here](https://chat.hyperjs.ml/)
 
 # Commands
 ## Client:
