@@ -1,0 +1,13 @@
+<br>CLIENT: /clearlog
+/clearname
+/help
+/join [room]
+/msg [user] [message]
+/nick [name]
+/rooms
+/users
+/whois [user/room]<br>OP: /kick [user]
+/op [user]
+/deop [user]
+/mute [user]
+/unmute [user]

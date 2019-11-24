@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
+
+html, body, .site, .app {
+	margin: 0;
+	padding: 0;
+	width: 100vw;
+	height: 100vh;
+}
+
+body {
+	background-color: black;
+	color: white;
+	font-family: 'Source Sans Pro', sans-serif;
+}
+
+div, h1, p {
+	margin: 0;
+	padding: 0;
+}
+
+a, a:visited {
+	color: #006eff;
+}
+
+.site, .app {
+	display: flex;
+	flex-direction: column;
+}
+
+/* ----------App---------- */
+.log, .message {
+	margin: 10px auto;
+	padding: 10px;
+	width: 80%;
+	border: 3px solid white;
+	background-color: #ffffff11;
+}
+
+.log {
+	display: flex;
+	overflow-y: scroll;
+	flex-direction: column;
+	flex-grow: 1;
+
+	overflow-wrap: break-word;
+}
+
+.item {
+	/* display: flex;
+	flex-direction: row; */
+}
+
+.item > p {
+	display: inline;
+}
+
+.item-time::before {
+	content: '[';
+}
+
+.item-time {
+	/* display: none; */
+	color: grey;
+}
+
+.item-time::after {
+	content: ']';
+}
+
+.item-name {
+	font-weight: 900;
+}
+
+.item-name::after {
+	content: ':';
+}
+
+.item.pm > .item-name::after {
+	content: ' >';
+}
+
+.item.server > .item-name::after {
+	content: '';
+}
+
+.item-message {
+	line-height: 1.2;
+}
+
+.item.server > .item-message {
+	color: lightgray;
+	font-style: italic;
+}
+
+.message {
+	display: block;
+	outline: none;
+
+	overflow-wrap: break-word;
+}
+
+.message:empty::before {
+	content: 'Send a message...';
+}

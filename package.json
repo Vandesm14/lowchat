@@ -1,32 +1,16 @@
 {
-  "name": "lowchat",
-  "version": "1.0.0",
-  "description": "A hyper-simple chatting system built on websockets.",
-  "main": "app.js",
-  "directories": {
-    "doc": "docs"
-  },
-  "dependencies": {
-    "body-parser": "^1.19.0",
-    "camelcase": "^5.3.1",
-    "express": "^4.17.1",
-    "log": "^6.0.0",
-    "socket.io": "^2.2.0",
-    "winston": "^3.2.1"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Vandesm14/lowchat.git"
-  },
-  "keywords": [],
+  "name": "app",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
   "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Vandesm14/lowchat/issues"
-  },
-  "homepage": "https://github.com/Vandesm14/lowchat#readme"
+  "license": "MIT",
+  "dependencies": {
+    "cookie-parser": "^1.4.4",
+    "body-parser": "latest",
+    "dotenv": "^8.2.0",
+    "express": "latest",
+    "socket.io": "2.0.3"
+  }
 }
