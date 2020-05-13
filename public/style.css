@@ -1,104 +1,104 @@
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
 
 html, body, .site, .app {
-	margin: 0;
-	padding: 0;
-	width: 100vw;
-	height: 100vh;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
 }
 
 body {
-	background-color: black;
-	color: white;
-	font-family: 'Source Sans Pro', sans-serif;
+  background-color: black;
+  color: white;
+  font-family: 'Source Sans Pro', sans-serif;
 }
 
 div, h1, p {
-	margin: 0;
-	padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 a, a:visited {
-	color: #006eff;
+  color: #006eff;
 }
 
 .site, .app {
-	display: flex;
-	flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ----------App---------- */
 .log, .message {
-	margin: 10px auto;
-	padding: 10px;
-	width: 80%;
-	border: 3px solid white;
-	background-color: #ffffff11;
+  margin: 10px auto;
+  padding: 10px;
+  width: 80%;
+  border: 3px solid white;
+  background-color: #ffffff11;
 }
 
 .log {
-	display: flex;
-	overflow-y: scroll;
-	flex-direction: column;
-	flex-grow: 1;
+  display: flex;
+  overflow-y: scroll;
+  flex-direction: column;
+  flex-grow: 1;
 
-	overflow-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .item {
-	/* display: flex;
+  /* display: flex;
 	flex-direction: row; */
 }
 
 .item > p {
-	display: inline;
+  display: inline;
 }
 
 .item-time::before {
-	content: '[';
+  content: '[';
 }
 
 .item-time {
-	/* display: none; */
-	color: grey;
+  /* display: none; */
+  color: grey;
 }
 
 .item-time::after {
-	content: ']';
+  content: ']';
 }
 
 .item-name {
-	font-weight: 900;
+  font-weight: 900;
 }
 
 .item-name::after {
-	content: ':';
+  content: ':';
 }
 
 .item.pm > .item-name::after {
-	content: ' >';
+  content: ' >';
 }
 
 .item.server > .item-name::after {
-	content: '';
+  content: '';
 }
 
 .item-message {
-	line-height: 1.2;
+  line-height: 1.2;
 }
 
 .item.server > .item-message {
-	color: lightgray;
-	font-style: italic;
+  color: lightgray;
+  font-style: italic;
 }
 
 .message {
-	display: block;
-	outline: none;
+  display: block;
+  outline: none;
 
-	overflow-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .message:empty::before {
-	content: 'Send a message...';
+  content: 'Send a message...';
 }
