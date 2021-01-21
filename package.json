@@ -11,6 +11,6 @@
     "body-parser": "latest",
     "dotenv": "^8.2.0",
     "express": "latest",
-    "socket.io": "2.0.3"
+    "socket.io": "2.4.0"
   }
 }
